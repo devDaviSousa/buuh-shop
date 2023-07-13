@@ -6,13 +6,14 @@ import 'keen-slider/keen-slider.min.css';
 import { stripe } from "../lib/stripe"
 import Stripe from "stripe"
 import Link from "next/link";
+import Head from "next/head";
 
 interface HomeProps {
     products: {
         id: string
         name: string
         imageUrl: string
-        price: number
+        price: string
     }[]
 }
 
@@ -25,22 +26,28 @@ export default function Home({ products }: HomeProps) {
         }
     });
     return (
-        <HomeContainer ref={sliderRef} className="keen-slider">
-            {products.map(product => {
-                return (
-                    <Link href={`/product/${product.id}`} key={product.id}>
-                        <Product className="keen-slider__slide">
-                            <Image src={product.imageUrl} width={520} height={480} alt="" />
+        <>
+            <Head>
+                <title>Home | Buuh Shop</title>
+            </Head>
 
-                            <footer>
-                                <strong>{product.name}</strong>
-                                <span>{product.price}</span>
-                            </footer>
-                        </Product>
-                    </Link>
-                )
-            })}
-        </HomeContainer>
+            <HomeContainer ref={sliderRef} className="keen-slider">
+                {products.map(product => {
+                    return (
+                        <Link href={`/product/${product.id}`} key={product.id} prefetch={false}>
+                            <Product className="keen-slider__slide">
+                                <Image src={product.imageUrl} width={520} height={480} alt="" />
+
+                                <footer>
+                                    <strong>{product.name}</strong>
+                                    <span>{product.price}</span>
+                                </footer>
+                            </Product>
+                        </Link>
+                    )
+                })}
+            </HomeContainer>
+        </>
     )
 }
 
