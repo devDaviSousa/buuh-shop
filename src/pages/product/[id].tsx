@@ -35,7 +35,6 @@ export default function Product({ product }: ProductProps) {
         } catch {
             setIsCreatingCheckoutSession(false);
             alert('Falha ao redirecionar ao checkout')
-
         }
     }
 
