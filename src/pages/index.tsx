@@ -7,6 +7,9 @@ import { stripe } from "../lib/stripe"
 import Stripe from "stripe"
 import Link from "next/link";
 import Head from "next/head";
+import { useSelector } from "react-redux";
+import { IState } from "@/store";
+import { ICartItem } from "@/store/modules/cart/types";
 
 interface HomeProps {
     products: {
@@ -19,9 +22,12 @@ interface HomeProps {
 
 export default function Home({ products }: HomeProps) {
 
+    const cart = useSelector<IState, ICartItem[]>(state => state.cart.items)
+    console.log(cart);
+
     const [sliderRef] = useKeenSlider({
         slides: {
-            perView: 3,
+            perView: 2,
             spacing: 48
         }
     });
@@ -31,13 +37,13 @@ export default function Home({ products }: HomeProps) {
                 <title>Home | Buuh Shop</title>
             </Head>
 
+
             <HomeContainer ref={sliderRef} className="keen-slider">
                 {products.map(product => {
                     return (
                         <Link href={`/product/${product.id}`} key={product.id} prefetch={false}>
                             <Product className="keen-slider__slide">
                                 <Image src={product.imageUrl} width={520} height={480} alt="" />
-
                                 <footer>
                                     <strong>{product.name}</strong>
                                     <span>{product.price}</span>

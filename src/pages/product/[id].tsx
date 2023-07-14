@@ -3,9 +3,12 @@ import Image from "next/image";
 import { GetStaticPaths, GetStaticProps } from 'next';
 import { stripe } from '@/lib/stripe';
 import Stripe from 'stripe';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import axios from "axios";
 import Head from 'next/head';
+import { IProduct } from '@/store/modules/cart/types';
+import { useDispatch } from 'react-redux';
+import { addProductToCart } from '@/store/modules/cart/actions';
 interface ProductProps {
     product: {
         id: string
@@ -20,6 +23,11 @@ interface ProductProps {
 export default function Product({ product }: ProductProps) {
 
     const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
+    const dispath = useDispatch();
+
+    const handleAddProductToCart = useCallback(() => {
+        dispath(addProductToCart(product))
+    }, [dispath, product])
 
     async function handleBuyButton() {
 
@@ -53,7 +61,7 @@ export default function Product({ product }: ProductProps) {
                     <h1>{product.name}</h1>
                     <span>{product.price}</span>
                     <p>{product.description}</p>
-                    <button disabled={isCreatingCheckoutSession} onClick={handleBuyButton}>Comprar agora</button>
+                    <button disabled={isCreatingCheckoutSession} onClick={handleAddProductToCart}>Comprar agora</button>
                 </ProductDetails>
             </ProductContainer>
         </>
