@@ -1,4 +1,4 @@
-import { HomeContainer, Product } from "@/styles/pages/home";
+import { DivIcon, Header, HomeContainer, Product } from "@/styles/pages/home";
 import Image from "next/image"
 import { GetStaticProps } from "next"
 import { useKeenSlider } from 'keen-slider/react';
@@ -10,6 +10,11 @@ import Head from "next/head";
 import { useSelector } from "react-redux";
 import { IState } from "@/store";
 import { ICartItem } from "@/store/modules/cart/types";
+import iconCart from "../assets/icon-cart.svg"
+
+import logoImg from "../assets/logo.svg"
+import { useEffect, useState } from "react";
+import { Cart } from "@/styles/pages/product";
 
 interface HomeProps {
     products: {
@@ -22,38 +27,92 @@ interface HomeProps {
 
 export default function Home({ products }: HomeProps) {
 
-    const cart = useSelector<IState, ICartItem[]>(state => state.cart.items)
-    console.log(cart);
+    const cart = useSelector<IState, ICartItem[]>(state => state.cart.items);
+    const [quantityCart, setQuantityCart] = useState(0);
+
+
+    useEffect(() => {
+        if (cart.length > 0) {
+            var sum = 0;
+            const quantityItems = cart.map(item => item.quantity);
+
+            for (var i = 0; i < quantityItems.length; i++) {
+                sum += quantityItems[i];
+            }
+
+            setQuantityCart(sum);
+        }
+    }, [cart])
 
     const [sliderRef] = useKeenSlider({
         slides: {
-            perView: 2,
+            perView: 3,
             spacing: 48
         }
     });
     return (
-        <>
+        <div style={{ width: "90%", margin: "0 auto" }}>
             <Head>
                 <title>Home | Buuh Shop</title>
             </Head>
-
+            <Header>
+                <div style={{ flex: 1 }}>
+                    <Image src={logoImg} alt="" />
+                </div>
+                <Cart >
+                    <DivIcon>
+                        <Image src={iconCart} alt="" />
+                        <span style={{
+                            width: "40px",
+                            height: "40px",
+                            background: "black",
+                            borderRadius: "50%",
+                            position: "absolute",
+                            right: "75px",
+                            top: "33px",
+                            display: quantityCart > 0 ? "flex" : 'none',
+                            alignItems: "center",
+                            justifyContent: "center",
+                            fontSize: '1.3rem'
+                        }}>{quantityCart}</span>
+                    </DivIcon>
+                </Cart >
+            </Header>
 
             <HomeContainer ref={sliderRef} className="keen-slider">
                 {products.map(product => {
                     return (
                         <Link href={`/product/${product.id}`} key={product.id} prefetch={false}>
-                            <Product className="keen-slider__slide">
+                            <Product className="keen-slider__slide number-slide1">
                                 <Image src={product.imageUrl} width={520} height={480} alt="" />
                                 <footer>
-                                    <strong>{product.name}</strong>
-                                    <span>{product.price}</span>
+                                    <div>
+                                        <strong>{product.name}</strong>
+                                        <span>{product.price}</span>
+                                    </div>
+                                    <DivIcon>
+                                        <Image src={iconCart} alt="" />
+                                    </DivIcon>
                                 </footer>
+
                             </Product>
+                            {/* <Product className="keen-slider__slide">
+                                <Image src={product.imageUrl} width={520} height={480} alt="" />
+                                <footer>
+                                    <div>
+                                        <strong>{product.name}</strong>
+                                        <span>{product.price}</span>
+                                    </div>
+                                    <DivIcon>
+                                        <Image src={iconCart} alt="" />
+                                    </DivIcon>
+                                </footer>
+                            </Product> */}
                         </Link>
                     )
                 })}
             </HomeContainer>
-        </>
+        </div>
     )
 }
 

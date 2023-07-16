@@ -71,3 +71,12 @@ export const ProductDetails = styled('div', {
         }
     },
 })
+
+export const Cart = styled('div', {
+    display: "flex",
+    flex: 1,
+    justifyContent: 'end',
+    //marginRight: '4rem',
+
+
+})
