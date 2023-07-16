@@ -76,7 +76,18 @@ export const Cart = styled('div', {
     display: "flex",
     flex: 1,
     justifyContent: 'end',
-    //marginRight: '4rem',
+    span: {
+        width: "40px",
+        height: "40px",
+        background: "black",
+        borderRadius: "50%",
+        position: "absolute",
+        right: "75px",
+        top: "33px",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: '1.3rem'
+    }
 
 
 })

@@ -75,6 +75,19 @@ export const DivIcon = styled('button', {
     alignItems: 'center',
     justifyContent: "center",
     cursor: 'pointer',
+    border: "none",
+    span: {
+        width: "40px",
+        height: "40px",
+        background: "black",
+        borderRadius: "50%",
+        position: "absolute",
+        right: "75px",
+        top: "33px",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: '1.3rem'
+    }
 
 })
 export const Header = styled('header', {

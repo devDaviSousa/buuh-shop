@@ -80,17 +80,8 @@ export default function Product({ product }: ProductProps) {
                         <Image src={iconCart} alt="" />
                     </DivIcon>
                     <span style={{
-                        width: "40px",
-                        height: "40px",
-                        background: "black",
-                        borderRadius: "50%",
-                        position: "absolute",
-                        right: "75px",
-                        top: "33px",
                         display: quantityCart > 0 ? "flex" : 'none',
-                        alignItems: "center",
-                        justifyContent: "center",
-                        fontSize: '1.3rem'
+
                     }}>{quantityCart}</span>
                 </Cart >
             </Header>
@@ -117,7 +108,6 @@ export const getStaticPaths: GetStaticPaths = async () => {
         fallback: "blocking"
     }
 }
-
 
 export const getStaticProps: GetStaticProps<any, { id: string }> = async ({ params }) => {
 

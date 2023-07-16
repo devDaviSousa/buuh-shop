@@ -62,20 +62,11 @@ export default function Home({ products }: HomeProps) {
                 <Cart >
                     <DivIcon>
                         <Image src={iconCart} alt="" />
-                        <span style={{
-                            width: "40px",
-                            height: "40px",
-                            background: "black",
-                            borderRadius: "50%",
-                            position: "absolute",
-                            right: "75px",
-                            top: "33px",
-                            display: quantityCart > 0 ? "flex" : 'none',
-                            alignItems: "center",
-                            justifyContent: "center",
-                            fontSize: '1.3rem'
-                        }}>{quantityCart}</span>
                     </DivIcon>
+                    <span style={{
+                        display: quantityCart > 0 ? "flex" : 'none',
+
+                    }}>{quantityCart}</span>
                 </Cart >
             </Header>
 
@@ -94,20 +85,7 @@ export default function Home({ products }: HomeProps) {
                                         <Image src={iconCart} alt="" />
                                     </DivIcon>
                                 </footer>
-
                             </Product>
-                            {/* <Product className="keen-slider__slide">
-                                <Image src={product.imageUrl} width={520} height={480} alt="" />
-                                <footer>
-                                    <div>
-                                        <strong>{product.name}</strong>
-                                        <span>{product.price}</span>
-                                    </div>
-                                    <DivIcon>
-                                        <Image src={iconCart} alt="" />
-                                    </DivIcon>
-                                </footer>
-                            </Product> */}
                         </Link>
                     )
                 })}
