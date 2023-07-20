@@ -13,12 +13,14 @@ import { IState } from '@/store';
 import { DivIcon, Header } from '@/styles/pages/home';
 import iconCart from "../../assets/icon-cart.svg"
 import logoImg from "../../assets/logo.svg"
+import Link from 'next/link';
 
 interface ProductProps {
     product: {
         id: string
         name: string
         imageUrl: string
+        unitAmount: number;
         price: string
         description: string
         defaultPriceId: string
@@ -26,9 +28,10 @@ interface ProductProps {
 }
 
 export default function Product({ product }: ProductProps) {
-
     const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
     const dispath = useDispatch();
+    const cart = useSelector<IState, ICartItem[]>(state => state.cart.items);
+    const [quantityCart, setQuantityCart] = useState(0);
 
     const handleAddProductToCart = useCallback(() => {
         dispath(addProductToCart(product))
@@ -40,8 +43,10 @@ export default function Product({ product }: ProductProps) {
             setIsCreatingCheckoutSession(true);
 
             const response = await axios.post('/api/checkout', {
-                priceId: product.defaultPriceId
+                priceId: product.defaultPriceId,
+                cart: cart ?? ''
             })
+
             const { checkoutUrl } = response.data;
 
             window.location.href = checkoutUrl;
@@ -51,8 +56,6 @@ export default function Product({ product }: ProductProps) {
         }
     }
 
-    const cart = useSelector<IState, ICartItem[]>(state => state.cart.items);
-    const [quantityCart, setQuantityCart] = useState(0);
 
     useEffect(() => {
         if (cart.length > 0) {
@@ -67,24 +70,10 @@ export default function Product({ product }: ProductProps) {
     }, [cart])
 
     return (
-        <div style={{ width: "90%", margin: '0 auto' }}>
+        <div style={{ width: "90%", margin: '6rem auto' }}>
             <Head>
                 <title>{product.name} | Buuh Shop</title>
             </Head>
-            <Header>
-                <div style={{ flex: 1 }}>
-                    <Image src={logoImg} alt="" />
-                </div>
-                <Cart onClick={handleBuyButton} >
-                    <DivIcon>
-                        <Image src={iconCart} alt="" />
-                    </DivIcon>
-                    <span style={{
-                        display: quantityCart > 0 ? "flex" : 'none',
-
-                    }}>{quantityCart}</span>
-                </Cart >
-            </Header>
             <ProductContainer>
                 <ImageContainer>
                     <Image src={product.imageUrl} alt='' width={580} height={580}></Image>
@@ -94,7 +83,7 @@ export default function Product({ product }: ProductProps) {
                     <h1>{product.name}</h1>
                     <span>{product.price}</span>
                     <p>{product.description}</p>
-                    <button disabled={isCreatingCheckoutSession} onClick={handleAddProductToCart}>Comprar agora</button>
+                    <button disabled={isCreatingCheckoutSession} onClick={handleAddProductToCart}>Colocar na sacola</button>
                 </ProductDetails>
             </ProductContainer>
         </div>
@@ -125,6 +114,7 @@ export const getStaticProps: GetStaticProps<any, { id: string }> = async ({ para
                 id: product.id,
                 name: product.name,
                 imageUrl: product.images[0],
+                unitAmount: price.unit_amount,
                 price: new Intl.NumberFormat('pt-BR', {
                     style: 'currency',
                     currency: 'BRL',

@@ -1,4 +1,4 @@
-import { DivIcon, Header, HomeContainer, Product } from "@/styles/pages/home";
+import { ArrowLeft, ArrowRight, DivIcon, Header, HomeContainer, Product } from "@/styles/pages/home";
 import Image from "next/image"
 import { GetStaticProps } from "next"
 import { useKeenSlider } from 'keen-slider/react';
@@ -11,10 +11,11 @@ import { useSelector } from "react-redux";
 import { IState } from "@/store";
 import { ICartItem } from "@/store/modules/cart/types";
 import iconCart from "../assets/icon-cart.svg"
-
 import logoImg from "../assets/logo.svg"
 import { useEffect, useState } from "react";
 import { Cart } from "@/styles/pages/product";
+import axios from "axios";
+import { CaretLeft, CaretRight } from "phosphor-react";
 
 interface HomeProps {
     products: {
@@ -28,67 +29,110 @@ interface HomeProps {
 export default function Home({ products }: HomeProps) {
 
     const cart = useSelector<IState, ICartItem[]>(state => state.cart.items);
-    const [quantityCart, setQuantityCart] = useState(0);
+    //const [isCreatingCheckoutSession, setIsCreatingCheckoutSession] = useState(false);
+    const [current, setCurrent] = useState(0);
 
 
-    useEffect(() => {
-        if (cart.length > 0) {
-            var sum = 0;
-            const quantityItems = cart.map(item => item.quantity);
+    async function handleBuyButton() {
 
-            for (var i = 0; i < quantityItems.length; i++) {
-                sum += quantityItems[i];
+        try {
+            //setIsCreatingCheckoutSession(true);
+            const response = await axios.post('/api/checkout', {
+                cart: cart ?? ''
+            })
+
+            const { checkoutUrl } = response.data;
+
+            window.location.href = checkoutUrl;
+        } catch {
+            //setIsCreatingCheckoutSession(false);
+            if (cart.length === 0) {
+
+                alert('Carrinho vazio')
+            } else {
+
+                alert('Falha ao redirecionar ao checkout')
             }
-
-            setQuantityCart(sum);
         }
-    }, [cart])
+    }
 
-    const [sliderRef] = useKeenSlider({
+    const [sliderRef, instanceRef] = useKeenSlider({
         slides: {
-            perView: 3,
+            origin: "center",
+            perView: 2,
             spacing: 48
-        }
+        },
+        breakpoints: {
+            '(max-width:768px)': {
+                slides: {
+                    perView: 1,
+                    spacing: 24
+                }
+            }
+        },
+        animationEnded(event) {
+            setCurrent(event.track.details.abs);
+
+            event.container.children[event.track.details.abs].children[0].classList.add('active');
+        },
+
+        animationStarted(event) {
+            event.container.children[event.track.details.abs].children[0].classList.remove('active');
+        },
     });
+
+    useEffect(() => instanceRef.current!.container.children[0].children[0].classList.add('active'), [instanceRef]);
+
     return (
-        <div style={{ width: "90%", margin: "0 auto" }}>
+        <div style={{ width: "90%", margin: '6rem auto' }}>
             <Head>
                 <title>Home | Buuh Shop</title>
             </Head>
-            <Header>
-                <div style={{ flex: 1 }}>
-                    <Image src={logoImg} alt="" />
+            <HomeContainer >
+
+                {current === 0
+                    ?
+                    <></>
+                    :
+                    <ArrowLeft
+                        onClick={(e: any) => e.stopPropagation() || instanceRef.current?.prev()}
+                    >
+                        <CaretLeft weight="bold" size={48} />
+                    </ArrowLeft>
+                }
+
+                <div ref={sliderRef} className="keen-slider">
+                    {products.map(product => {
+                        return (
+                            <Link href={`/product/${product.id}`} key={product.id} prefetch={false}>
+                                <Product className="keen-slider__slide number-slide1">
+                                    <Image src={product.imageUrl} width={520} height={480} alt="" />
+                                    <footer>
+                                        <div className="title">
+                                            <strong>{product.name}</strong>
+                                            <span>{product.price}</span>
+                                        </div>
+                                        <DivIcon>
+                                            <Image src={iconCart} alt="" />
+                                        </DivIcon>
+                                    </footer>
+                                </Product>
+                            </Link>
+                        )
+                    })}
                 </div>
-                <Cart >
-                    <DivIcon>
-                        <Image src={iconCart} alt="" />
-                    </DivIcon>
-                    <span style={{
-                        display: quantityCart > 0 ? "flex" : 'none',
 
-                    }}>{quantityCart}</span>
-                </Cart >
-            </Header>
+                {current === products.length - 1
+                    ?
+                    <></>
+                    :
+                    <ArrowRight
+                        onClick={(e: any) => e.stopPropagation() || instanceRef.current?.next()}
+                    >
+                        <CaretRight weight="bold" size={48} />
+                    </ArrowRight>
+                }
 
-            <HomeContainer ref={sliderRef} className="keen-slider">
-                {products.map(product => {
-                    return (
-                        <Link href={`/product/${product.id}`} key={product.id} prefetch={false}>
-                            <Product className="keen-slider__slide number-slide1">
-                                <Image src={product.imageUrl} width={520} height={480} alt="" />
-                                <footer>
-                                    <div>
-                                        <strong>{product.name}</strong>
-                                        <span>{product.price}</span>
-                                    </div>
-                                    <DivIcon>
-                                        <Image src={iconCart} alt="" />
-                                    </DivIcon>
-                                </footer>
-                            </Product>
-                        </Link>
-                    )
-                })}
             </HomeContainer>
         </div>
     )
