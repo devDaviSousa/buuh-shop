@@ -8,7 +8,6 @@ import Image from 'next/image';
 import { useSelector } from "react-redux";
 import { IState } from "@/store";
 import { ICartItem } from "@/store/modules/cart/types";
-
 import logoImg from '../../assets/logo.svg';
 import { CartShopping } from "../CartShopping";
 

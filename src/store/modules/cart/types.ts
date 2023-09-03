@@ -2,10 +2,10 @@ export interface IProduct {
     id: string
     name: string
     imageUrl: string
+    unitAmount: number
     price: string
     description: string
     defaultPriceId: string,
-    unitAmount: number
 }
 
 export interface ICartItem {

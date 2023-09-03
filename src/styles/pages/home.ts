@@ -42,7 +42,6 @@ export const Product = styled('div', {
             opacity: 1,
         },
     },
-
     background: 'linear-gradient(180deg, #1ea483 0%, #7465d4 100%)',
     borderRadius: 8,
     padding: '0.25rem',
@@ -83,7 +82,7 @@ export const Product = styled('div', {
             flex: 1,
 
             strong: {
-                fontSize: '$lg',
+                fontSize: '$2xl',
                 color: '$gray100',
             },
 

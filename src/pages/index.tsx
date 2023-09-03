@@ -89,7 +89,6 @@ export default function Home({ products }: HomeProps) {
                 <title>Home | Buuh Shop</title>
             </Head>
             <HomeContainer >
-
                 {current === 0
                     ?
                     <></>
@@ -132,8 +131,10 @@ export default function Home({ products }: HomeProps) {
                         <CaretRight weight="bold" size={48} />
                     </ArrowRight>
                 }
-
             </HomeContainer>
+            <div>
+                {/* <Image src={}></Image> */}
+            </div>
         </div>
     )
 }
@@ -153,7 +154,8 @@ export const getStaticProps: GetStaticProps = async () => {
             price: new Intl.NumberFormat('pt-BR', {
                 style: "currency",
                 currency: "BRL"
-            }).format(price.unit_amount as number / 100)
+            }).format(price?.unit_amount as number / 100)
+
         }
     })
 

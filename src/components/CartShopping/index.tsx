@@ -1,9 +1,7 @@
-import { useContext, useEffect, useState } from 'react';
+import { useCallback, useContext, useEffect, useState } from 'react';
 import Image from 'next/image';
 import axios from 'axios';
 import { CircleNotch, Minus, Plus, TrashSimple, X } from 'phosphor-react';
-
-//import { CartShoppingContext } from '../../contexts/CartShoppingContext';
 
 import {
     CartShoppingContainer,
@@ -15,9 +13,10 @@ import {
     Actions,
     PurchaseDetails,
 } from './styles';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { IState } from '@/store';
 import { ICartItem } from '@/store/modules/cart/types';
+import { addProductToCart, decreaseProductToCart, removeProductToCart } from '@/store/modules/cart/actions';
 
 interface CartShoppingProps {
     styles: any;
@@ -36,8 +35,7 @@ export function CartShopping({ styles, closeCartShopping }: CartShoppingProps) {
         quantityCart: 0,
         amoutCart: 0
     });
-
-    //const { amount, cartShopping, removeItem, decreaseItemQuantity, increaseItemQuantity } = useContext(CartShoppingContext)
+    const dispath = useDispatch();
 
     async function handleBuyProduct() {
         try {
@@ -49,8 +47,6 @@ export function CartShopping({ styles, closeCartShopping }: CartShoppingProps) {
 
             window.location.href = checkoutUrl
         } catch (err) {
-            // Conectar com uma ferramenta de observabilidade (Datadog / Sentry)
-
             setIsCreatingCheckoutSession(false)
 
             alert('Falha ao redirecionar ao checkout!')
@@ -93,44 +89,52 @@ export function CartShopping({ styles, closeCartShopping }: CartShoppingProps) {
 
             <Items>
                 {
-                    cart.map(product => {
-                        return (
-                            <Item key={product.product.id}>
-                                <ImageContainer>
-                                    <Image src={product.product.imageUrl} width={100} height={100} alt="" />
-                                </ImageContainer>
+                    cart.length > 0 ?
+                        cart.map(product => {
+                            return (
+                                <Item key={product.product.id}>
+                                    <ImageContainer>
+                                        <Image src={product.product.imageUrl} width={100} height={100} alt="" />
+                                    </ImageContainer>
 
-                                <Info>
-                                    <span>{product.product.name}</span>
-                                    <strong>{product.product.price}</strong>
-                                </Info>
+                                    <Info>
+                                        <span>{product.product.name}</span>
+                                        <strong>{product.product.price}</strong>
+                                    </Info>
 
-                                <Actions>
-                                    <div className="quantity">
+                                    <Actions>
+                                        <div className="quantity">
 
-                                        <button onClick={() => { }}>
-                                            <Minus weight="bold" color="white" size={14} />
+                                            <button onClick={
+                                                useCallback(() => {
+                                                    dispath(decreaseProductToCart(product.product))
+                                                }, [dispath, product])
+                                            }>
+                                                <Minus weight="bold" color="white" size={14} />
+                                            </button>
+
+                                            <span>{product.quantity}</span>
+
+                                            <button onClick={useCallback(() => {
+                                                dispath(addProductToCart(product.product))
+                                            }, [dispath, product])}>
+                                                <Plus weight="bold" color="white" size={14} />
+                                            </button>
+                                        </div>
+
+                                        <button
+                                            className="remove"
+                                            onClick={useCallback(() => {
+                                                dispath(removeProductToCart(product.product))
+                                            }, [dispath, product])}
+                                        >
+                                            <TrashSimple weight="bold" color="white" size={14} />
+                                            Remover
                                         </button>
-
-                                        <span>{product.quantity}</span>
-
-                                        <button onClick={() => { }}>
-                                            <Plus weight="bold" color="white" size={14} />
-                                        </button>
-                                    </div>
-
-
-                                    <button
-                                        className="remove"
-                                    //onClick={() => removeItem(product)}
-                                    >
-                                        <TrashSimple weight="bold" color="white" size={14} />
-                                        Remover
-                                    </button>
-                                </Actions>
-                            </Item>
-                        )
-                    })
+                                    </Actions>
+                                </Item>
+                            )
+                        }) : null
                 }
             </Items>
 
@@ -142,7 +146,14 @@ export function CartShopping({ styles, closeCartShopping }: CartShoppingProps) {
 
                 <div>
                     <p>Valor total</p>
-                    <span>{detailsCart.amoutCart}</span>
+                    <span>{
+
+                        new Intl.NumberFormat('pt-BR', {
+                            style: "currency",
+                            currency: "BRL"
+                        }).format(detailsCart.amoutCart as number)
+
+                    }</span>
                 </div>
 
                 <button onClick={handleBuyProduct} disabled={isCreatingCheckoutSession} >

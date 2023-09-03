@@ -18,9 +18,28 @@ const cart: Reducer<ICartState> = (state = INITIAL_STATE, action) => {
                 if (productInCartIndex >= 0) {
                     draft.items[productInCartIndex].quantity++;
                 } else {
-
                     draft.items.push({ product, quantity: 1 });
                 }
+                break;
+            }
+            case 'DECREASE_PRODUCT_TO_CART': {
+                const { product } = action.payload
+
+                const productInCartIndex = draft.items.findIndex(item => item.product.id === product.id);
+                if (draft.items[productInCartIndex].quantity <= 1) {
+                    return
+                }
+
+                draft.items[productInCartIndex].quantity--
+
+                break;
+            }
+            case 'REMOVE_PRODUCT_TO_CART': {
+                const { product } = action.payload
+                //console.log(draft.items.filter(item => item.product.id !== product.id))
+                const teste = draft.items.findIndex(item => item.product.id === product.id)
+                if (teste !== -1) draft.items.splice(teste, 1);
+
                 break;
             }
             default: {
